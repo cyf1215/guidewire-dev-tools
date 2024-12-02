@@ -51,7 +51,9 @@ module.exports = {
         },
         authToken: process.env.GITHUB_TOKEN,
         prerelease: false,
-        draft: true
+        draft: false,
+        tagPrefix: 'v',
+        releaseType: 'release'
       }
     }
   ]
