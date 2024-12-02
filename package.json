@@ -2,7 +2,31 @@
   "name": "guidewire-dev-tools",
   "productName": "guidewire-dev-tools",
   "version": "0.0.3",
-  "description": "My Electron application description",
+  "description": "A development toolkit for Guidewire applications",
+  "keywords": [
+    "guidewire",
+    "development-tools",
+    "electron",
+    "react-devtools",
+    "hot-reload",
+    "developer-tools"
+  ],
+  "author": {
+    "name": "Ifan Cao",
+    "email": "ifan.cao@capgemini.com",
+    "url": "https://github.com/cyf1215"
+  },
+  "homepage": "https://github.com/cyf1215/guidewire-dev-tools#readme",
+  "bugs": {
+    "url": "https://github.com/cyf1215/guidewire-dev-tools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cyf1215/guidewire-dev-tools.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -29,17 +53,8 @@
     "electron-devtools-installer": "^3.2.0",
     "electron-reloader": "^1.2.3"
   },
-  "keywords": [],
-  "author": {
-    "name": "Ifan Cao",
-    "email": "ifan.cao@capgemini.com"
-  },
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cyf1215/guidewire-dev-tools.git"
   }
 }

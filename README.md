@@ -8,12 +8,18 @@
 - 开发环境热重载
 - 跨平台支持 (Windows, macOS, Linux)
 
-## 开发环境要求
+## 安装方式
 
-- Node.js (推荐 v18 或更高版本)
-- npm 或 yarn 包管理器
+### 方式一：直接下载安装（推荐）
 
-## 安装
+1. 访问 [Releases](https://github.com/cyf1215/guidewire-dev-tools/releases) 页面
+2. 下载最新版本的安装包：
+   - Windows: `guidewire-dev-tools-[版本号].Setup.exe`
+   - macOS: 即将支持
+   - Linux: 即将支持
+3. 运行安装程序，按照提示完成安装
+
+### 方式二：从源码构建
 
 1. 克隆项目
 
@@ -28,11 +34,21 @@
    npm install
    ```
 
-   或者使用 yarn
+3. 构建应用
 
    ```bash
-   yarn install
+   npm run make
    ```
+
+4. 安装包位置：
+   - Windows: `out/make/squirrel.windows/x64`
+   - macOS: `out/make/zip/darwin/x64`
+   - Linux: `out/make/deb/x64` 或 `out/make/rpm/x64`
+
+## 开发环境要求
+
+- Node.js (推荐 v18 或更高版本)
+- npm 或 yarn 包管理器
 
 ## 开发
 
