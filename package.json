@@ -1,7 +1,7 @@
 {
   "name": "guidewire-dev-tools",
   "productName": "Guidewire Dev Tools",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A development toolkit for Guidewire applications",
   "keywords": [
     "guidewire",
@@ -65,7 +65,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -79,7 +81,11 @@
       "language": "2052",
       "multiLanguageInstaller": true,
       "displayLanguageSelector": true,
-      "installerLanguages": ["zh-CN", "en-US", "ja-JP"],
+      "installerLanguages": [
+        "zh-CN",
+        "en-US",
+        "ja-JP"
+      ],
       "artifactName": "Guidewire Dev Tools Setup.${ext}",
       "license": "LICENSE",
       "deleteAppDataOnUninstall": false
