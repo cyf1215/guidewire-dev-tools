@@ -15,26 +15,18 @@ module.exports = {
         iconUrl: 'https://raw.githubusercontent.com/cyf1215/guidewire-dev-tools/main/assets/icon.ico',
         loadingGif: './assets/installing.gif',
         setupExe: 'Guidewire Dev Tools Setup.exe',
-        allowElevation: true,
-        defaultInstallPath: "C:\\Program Files\\Guidewire Dev Tools",
-        shortcutFolderName: "Guidewire Dev Tools",
-        createDesktopShortcut: true,
-        createStartMenuShortcut: true,
+        setupExeDir: '.',
+        noMsi: true,
         registryKeys: {
           "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\GuidewireDevTools": {
             "DisplayName": "Guidewire Dev Tools",
-            "UninstallString": "C:\\Program Files\\Guidewire Dev Tools\\Uninstall Guidewire Dev Tools.exe",
-            "DisplayIcon": "C:\\Program Files\\Guidewire Dev Tools\\Guidewire Dev Tools.exe",
+            "DisplayIcon": "%INSTALLPATH%\\Guidewire Dev Tools.exe",
+            "UninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe",
+            "QuietUninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe --uninstall -s",
             "Publisher": "Ifan Cao",
-            "URLInfoAbout": "https://github.com/cyf1215/guidewire-dev-tools",
-            "HelpLink": "https://github.com/cyf1215/guidewire-dev-tools/issues"
+            "DisplayVersion": "0.0.5"
           }
-        },
-        noMsi: false,
-        setupMsi: 'Guidewire Dev Tools.msi',
-        allowDowngrade: false,
-        removeDefaultProgram: true,
-        deleteAppDataOnUninstall: false
+        }
       }
     },
     {

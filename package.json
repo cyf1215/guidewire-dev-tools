@@ -58,46 +58,5 @@
     "electron-log": "^5.2.3",
     "electron-squirrel-startup": "^1.0.1",
     "electron-updater": "^6.3.9"
-  },
-  "build": {
-    "appId": "com.guidewire.devtools",
-    "productName": "Guidewire Dev Tools",
-    "win": {
-      "icon": "./assets/icon.ico",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Guidewire Dev Tools",
-      "uninstallDisplayName": "Guidewire Dev Tools",
-      "language": "2052",
-      "multiLanguageInstaller": true,
-      "displayLanguageSelector": true,
-      "installerLanguages": [
-        "zh-CN",
-        "en-US",
-        "ja-JP"
-      ],
-      "artifactName": "Guidewire Dev Tools Setup.${ext}",
-      "license": "LICENSE",
-      "deleteAppDataOnUninstall": false
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "cyf1215",
-      "repo": "guidewire-dev-tools",
-      "private": false,
-      "releaseType": "release"
-    }
   }
 }
