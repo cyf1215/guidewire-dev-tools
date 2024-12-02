@@ -1,17 +1,29 @@
 const { dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 // 配置日志
-autoUpdater.logger = require('electron-log');
-autoUpdater.logger.transports.file.level = 'info';
+log.transports.file.level = 'info';
+autoUpdater.logger = log;
+
+// 配置更新源
+autoUpdater.setFeedURL({
+  provider: 'github',
+  owner: 'cyf1215',
+  repo: 'guidewire-dev-tools',
+  token: process.env.GITHUB_TOKEN
+});
 
 // 检查更新
 exports.checkForUpdates = () => {
   // 检查更新
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdates().catch(err => {
+    log.error('更新检查失败:', err);
+  });
 
   // 发现更新
   autoUpdater.on('update-available', (info) => {
+    log.info('发现新版本:', info.version);
     dialog.showMessageBox({
       type: 'info',
       title: '发现新版本',
@@ -28,11 +40,13 @@ exports.checkForUpdates = () => {
 
   // 更新下载进度
   autoUpdater.on('download-progress', (progressObj) => {
-    // 可以在这里更新进度条
+    log.info('下载进度:', progressObj.percent);
+    // 这里可以添加进度条更新逻辑
   });
 
   // 更新下载完成
   autoUpdater.on('update-downloaded', () => {
+    log.info('更新下载完成');
     dialog.showMessageBox({
       type: 'info',
       title: '更新就绪',
@@ -48,6 +62,7 @@ exports.checkForUpdates = () => {
 
   // 检查更新错误
   autoUpdater.on('error', (err) => {
+    log.error('更新错误:', err);
     dialog.showErrorBox('更新出错', err.message);
   });
 }; 
