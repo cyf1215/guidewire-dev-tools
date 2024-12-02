@@ -8,7 +8,9 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish --from-dry-run",
+    "publish": "electron-forge publish",
+    "publish:dry": "electron-forge publish --dry-run",
+    "publish:from-dry": "electron-forge publish --from-dry-run",
     "lint": "echo \"No linting configured\"",
     "release": "npm version patch && npm run publish"
   },
