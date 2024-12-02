@@ -118,3 +118,18 @@ MIT
 ## 作者
 
 Ifan Cao <ifan.cao@capgemini.com>
+
+## 安装说明
+
+### Windows 用户
+
+1. 下载最新版本的安装程序 `Guidewire Dev Tools Setup.exe`
+2. 运行安装程序
+3. 选择安装位置（默认为 `C:\Program Files\Guidewire Dev Tools`）
+4. 等待安装完成
+5. 从开始菜单或桌面快捷方式启动程序
+
+### 卸载说明
+
+1. 从 Windows 控制面板卸载
+2. 或使用开始菜单中的卸载选项

@@ -17,10 +17,24 @@ if (started) {
 }
 
 const createWindow = () => {
+  // 创建加载窗口
+  const loadingWindow = new BrowserWindow({
+    width: 300,
+    height: 350,
+    frame: false,
+    transparent: true,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  loadingWindow.loadFile(path.join(__dirname, 'loading.html'));
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    show: false,  // 初始不显示
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -28,7 +42,12 @@ const createWindow = () => {
     },
   });
 
-  // and load the index.html of the app.
+  // 主窗口加载完成后
+  mainWindow.once('ready-to-show', () => {
+    loadingWindow.close();
+    mainWindow.show();
+  });
+
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // 只在开发模式下打开 DevTools

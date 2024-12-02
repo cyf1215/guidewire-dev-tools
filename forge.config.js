@@ -4,12 +4,40 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './assets/icon'
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        setupIcon: './assets/icon.ico',
+        iconUrl: 'https://raw.githubusercontent.com/cyf1215/guidewire-dev-tools/main/assets/icon.ico',
+        loadingGif: './assets/installing.gif',
+        setupExe: 'Guidewire Dev Tools Setup.exe',
+        allowElevation: true,
+        defaultInstallPath: "C:\\Program Files\\Guidewire Dev Tools",
+        shortcutFolderName: "Guidewire Dev Tools",
+        createDesktopShortcut: true,
+        createStartMenuShortcut: true,
+        setupLanguages: ['zh-CN', 'en-US', 'ja-JP'],
+        language: '2052',
+        title: {
+          '2052': 'Guidewire 开发工具',
+          '1033': 'Guidewire Dev Tools',
+          '1041': 'Guidewire 開発ツール'
+        },
+        description: {
+          '2052': 'Guidewire 开发工具套件',
+          '1033': 'Development toolkit for Guidewire',
+          '1041': 'Guidewire 開発ツールキット'
+        },
+        authors: 'Ifan Cao',
+        owners: 'Capgemini',
+        requiresAdministrator: false,
+        removeDefaultProgram: true,
+        deleteAppDataOnUninstall: false,
+      }
     },
     {
       name: '@electron-forge/maker-zip',

@@ -1,6 +1,6 @@
 {
   "name": "guidewire-dev-tools",
-  "productName": "guidewire-dev-tools",
+  "productName": "Guidewire Dev Tools",
   "version": "0.0.3",
   "description": "A development toolkit for Guidewire applications",
   "keywords": [
@@ -56,5 +56,13 @@
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1"
+  },
+  "build": {
+    "appId": "com.guidewire.devtools",
+    "productName": "Guidewire Dev Tools",
+    "win": {
+      "icon": "./assets/icon.ico",
+      "target": ["nsis", "portable"]
+    }
   }
 }
