@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
 const started = require('electron-squirrel-startup');
+const { checkForUpdates } = require('./updater');
 
 // 在文件顶部添加
 process.on('uncaughtException', (error) => {
@@ -78,6 +79,11 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+
+  // 延迟检查更新，等待应用完全启动
+  setTimeout(() => {
+    checkForUpdates();
+  }, 3000);
 
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.

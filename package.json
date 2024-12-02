@@ -55,7 +55,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-log": "^5.2.3",
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-updater": "^6.3.9"
   },
   "build": {
     "appId": "com.guidewire.devtools",
@@ -89,6 +91,13 @@
       "artifactName": "Guidewire Dev Tools Setup.${ext}",
       "license": "LICENSE",
       "deleteAppDataOnUninstall": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "cyf1215",
+      "repo": "guidewire-dev-tools",
+      "private": false,
+      "releaseType": "release"
     }
   }
 }

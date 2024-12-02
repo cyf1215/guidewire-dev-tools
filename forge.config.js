@@ -32,7 +32,10 @@ module.exports = {
         },
         noMsi: false,
         setupMsi: 'Guidewire Dev Tools.msi',
-        remoteReleases: "https://github.com/cyf1215/guidewire-dev-tools",
+        remoteReleases: {
+          repo: "cyf1215/guidewire-dev-tools",
+          token: process.env.GITHUB_TOKEN
+        },
         allowDowngrade: false,
         removeDefaultProgram: true,
         deleteAppDataOnUninstall: false
