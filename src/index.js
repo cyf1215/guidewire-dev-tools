@@ -13,6 +13,23 @@ process.on('unhandledRejection', (error) => {
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
+  if (process.platform === 'win32') {
+    const squirrelCommand = process.argv[1];
+    switch (squirrelCommand) {
+      case '--squirrel-install':
+      case '--squirrel-updated':
+        // 执行安装后的操作
+        app.quit();
+        break;
+      case '--squirrel-uninstall':
+        // 执行卸载前的清理
+        app.quit();
+        break;
+      case '--squirrel-obsolete':
+        app.quit();
+        break;
+    }
+  }
   app.quit();
 }
 

@@ -63,9 +63,26 @@
     "win": {
       "icon": "./assets/icon.ico",
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Guidewire Dev Tools",
+      "uninstallDisplayName": "Guidewire Dev Tools",
+      "language": "2052",
+      "multiLanguageInstaller": true,
+      "displayLanguageSelector": true,
+      "installerLanguages": ["zh-CN", "en-US", "ja-JP"],
+      "artifactName": "Guidewire Dev Tools Setup.${ext}",
+      "license": "LICENSE",
+      "deleteAppDataOnUninstall": false
     }
   }
 }

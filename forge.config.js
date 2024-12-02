@@ -20,23 +20,22 @@ module.exports = {
         shortcutFolderName: "Guidewire Dev Tools",
         createDesktopShortcut: true,
         createStartMenuShortcut: true,
-        setupLanguages: ['zh-CN', 'en-US', 'ja-JP'],
-        language: '2052',
-        title: {
-          '2052': 'Guidewire 开发工具',
-          '1033': 'Guidewire Dev Tools',
-          '1041': 'Guidewire 開発ツール'
+        registryKeys: {
+          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\GuidewireDevTools": {
+            "DisplayName": "Guidewire Dev Tools",
+            "UninstallString": "C:\\Program Files\\Guidewire Dev Tools\\Uninstall Guidewire Dev Tools.exe",
+            "DisplayIcon": "C:\\Program Files\\Guidewire Dev Tools\\Guidewire Dev Tools.exe",
+            "Publisher": "Ifan Cao",
+            "URLInfoAbout": "https://github.com/cyf1215/guidewire-dev-tools",
+            "HelpLink": "https://github.com/cyf1215/guidewire-dev-tools/issues"
+          }
         },
-        description: {
-          '2052': 'Guidewire 开发工具套件',
-          '1033': 'Development toolkit for Guidewire',
-          '1041': 'Guidewire 開発ツールキット'
-        },
-        authors: 'Ifan Cao',
-        owners: 'Capgemini',
-        requiresAdministrator: false,
+        noMsi: false,
+        setupMsi: 'Guidewire Dev Tools.msi',
+        remoteReleases: "https://github.com/cyf1215/guidewire-dev-tools",
+        allowDowngrade: false,
         removeDefaultProgram: true,
-        deleteAppDataOnUninstall: false,
+        deleteAppDataOnUninstall: false
       }
     },
     {
