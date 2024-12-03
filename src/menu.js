@@ -1,4 +1,5 @@
-const { checkForUpdates, showUpdateSettings } = require('./updater');
+const { showUpdateSettings } = require('./updater');
+const { updateElectronApp } = require('update-electron-app');
 
 const template = [
   {
@@ -6,7 +7,7 @@ const template = [
     submenu: [
       {
         label: '检查更新',
-        click: () => checkForUpdates(true) // true 表示这是手动检查
+        click: () => updateElectronApp({ checkNow: true })
       },
       {
         label: '更新设置',
