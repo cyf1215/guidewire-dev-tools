@@ -1,7 +1,7 @@
 {
   "name": "guidewire-dev-tools",
   "productName": "Guidewire Dev Tools",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A development toolkit for Guidewire applications",
   "keywords": [
     "guidewire",
