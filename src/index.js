@@ -82,7 +82,7 @@ app.whenReady().then(async () => {
 
   // 延迟检查更新，等待应用完全启动
   setTimeout(() => {
-    checkForUpdates();
+    checkForUpdates(false);
   }, 3000);
 
   // On OS X it's common to re-create a window in the app when the
