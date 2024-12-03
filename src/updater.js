@@ -6,6 +6,9 @@ const Store = require('electron-store');
 // 创建配置存储实例
 const store = new Store();
 
+// 保存更新器实例
+let updater = null;
+
 // 从存储中获取自动更新设置
 const getAutoUpdateEnabled = () => {
   return store.get('autoUpdate', true); // 默认启用
@@ -27,13 +30,31 @@ exports.initAutoUpdater = () => {
     return;
   }
 
-  updateElectronApp({
+  updater = updateElectronApp({
     logger: log,
     repo: 'cyf1215/guidewire-dev-tools',
     updateInterval: '1 hour',
     enabled: getAutoUpdateEnabled(),
     notifyUser: true
   });
+
+  return updater;
+};
+
+// 手动检查更新
+exports.checkForUpdates = async () => {
+  if (!updater) {
+    log.info('更新器未初始化');
+    return;
+  }
+
+  try {
+    log.info('手动检查更新...');
+    await updater.checkForUpdates();
+  } catch (err) {
+    log.error('检查更新失败:', err);
+    dialog.showErrorBox('更新检查失败', err.message);
+  }
 };
 
 // 显示更新设置对话框

@@ -1,5 +1,4 @@
-const { showUpdateSettings } = require('./updater');
-const { updateElectronApp } = require('update-electron-app');
+const { showUpdateSettings, checkForUpdates } = require('./updater');
 
 const template = [
   {
@@ -7,7 +6,7 @@ const template = [
     submenu: [
       {
         label: '检查更新',
-        click: () => updateElectronApp({ checkNow: true })
+        click: () => checkForUpdates()
       },
       {
         label: '更新设置',
@@ -15,4 +14,7 @@ const template = [
       }
     ]
   }
-]; 
+];
+
+// 导出模板
+exports.template = template; 

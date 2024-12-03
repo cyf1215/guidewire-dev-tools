@@ -1,7 +1,8 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('node:path');
 const started = require('electron-squirrel-startup');
 const { initAutoUpdater } = require('./updater');
+const { template } = require('./menu');
 
 // 在文件顶部添加
 process.on('uncaughtException', (error) => {
@@ -78,6 +79,10 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+  // 设置应用菜单
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
   createWindow();
 
   // 初始化自动更新
