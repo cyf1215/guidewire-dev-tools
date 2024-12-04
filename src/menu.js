@@ -1,4 +1,4 @@
-const { showUpdateSettings, checkForUpdates } = require('./updater');
+const { checkForUpdates } = require('./updater');
 const { app } = require('electron');
 
 const template = [
@@ -7,20 +7,15 @@ const template = [
     submenu: [
       {
         label: `当前版本：v${app.getVersion()}`,
-        enabled: false  // 禁用点击
+        enabled: false
       },
-      { type: 'separator' },  // 添加分隔线
+      { type: 'separator' },
       {
         label: '检查更新',
         click: () => checkForUpdates()
-      },
-      {
-        label: '更新设置',
-        click: () => showUpdateSettings()
       }
     ]
   }
 ];
 
-// 导出模板
 exports.template = template; 
