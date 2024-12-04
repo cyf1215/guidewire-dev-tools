@@ -1,4 +1,4 @@
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
+const { updateElectronApp } = require('update-electron-app');
 const log = require('electron-log');
 const { dialog, app } = require('electron');
 const Store = require('electron-store');
@@ -24,10 +24,7 @@ exports.initAutoUpdater = () => {
 
   try {
     updater = updateElectronApp({
-      updateSource: {
-        type: UpdateSourceType.ElectronPublicUpdateService,
-        repo: 'cyf1215/guidewire-dev-tools'
-      },
+      repo: 'cyf1215/guidewire-dev-tools',
       updateInterval: '1 hour',  // 每小时检查一次更新
       logger: log,  // 使用 electron-log 记录日志
       notifyUser: false,  // 使用自定义通知
@@ -47,7 +44,7 @@ exports.initAutoUpdater = () => {
           type: 'info',
           title: '发现新版本',
           message: `发现新版本 v${status.version}`,
-          detail: `当前版本: v${app.getVersion()}\n最新版本: v${status.version}\n\n是否现在更新？`,
+          detail: `当前版本: v${app.getVersion()}\n最新版本: v${status.version}\n\n是否现在更新？\n\n更新说明：${status.notes || '无'}`,
           buttons: ['更新', '稍后', '设置'],
           defaultId: 0
         }).then(({ response }) => {
@@ -55,6 +52,20 @@ exports.initAutoUpdater = () => {
             updater.downloadUpdate();
           } else if (response === 2) {
             showUpdateSettings();
+          }
+        });
+      },
+      onUpdateDownloaded: () => {
+        dialog.showMessageBox({
+          type: 'info',
+          title: '更新就绪',
+          message: '更新已下载完成',
+          detail: '重启应用以完成安装',
+          buttons: ['立即重启', '稍后'],
+          defaultId: 0
+        }).then(({ response }) => {
+          if (response === 0) {
+            updater.quitAndInstall();
           }
         });
       }
