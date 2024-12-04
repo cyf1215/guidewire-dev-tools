@@ -78,20 +78,16 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
-  // 设置应用菜单
+app.whenReady().then(() => {
+  // 初始化更新器
+  initAutoUpdater();
+  
+  createWindow();
+  
+  // 设置菜单
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
-  createWindow();
-
-  // 确保在应用完全准备好后再初始化更新器
-  setTimeout(() => {
-    initAutoUpdater();
-  }, 3000);
-
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
