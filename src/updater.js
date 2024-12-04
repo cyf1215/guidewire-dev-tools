@@ -2,6 +2,10 @@ const { updateElectronApp } = require('update-electron-app');
 const log = require('electron-log');
 const { dialog, app } = require('electron');
 
+// 配置日志输出格式
+log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}] [{level}] {text}';
+log.transports.file.encoding = 'utf8';
+
 let updater = null;
 
 // 配置自动更新
@@ -15,12 +19,19 @@ exports.initAutoUpdater = () => {
   try {
     updater = updateElectronApp({
       repo: 'cyf1215/guidewire-dev-tools',
-      updateInterval: '5 minute',  // 测试用，之后改回合适的间隔
+      updateInterval: '5 minute',
       logger: log,
       notifyUser: false,
       onUpdateCheck: (status) => {
+        log.info('检查更新状态:', status);
         if (status === false) {
           log.info('没有可用的更新');
+          dialog.showMessageBox({
+            type: 'info',
+            title: '检查更新',
+            message: '当前已是最新版本',
+            buttons: ['确定']
+          });
           return;
         }
 
@@ -64,16 +75,32 @@ exports.initAutoUpdater = () => {
 // 手动检查更新
 exports.checkForUpdates = async () => {
   try {
+    log.info('开始手动检查更新...');
+    
     if (!updater) {
       log.info('更新器未初始化，正在初始化...');
       exports.initAutoUpdater();
     }
     
     if (updater) {
-      log.info('正在检查更新...');
+      log.info('正在执行更新检查...');
       await updater.checkForUpdates();
+    } else {
+      log.warn('更新器初始化失败，无法检查更新');
+      dialog.showMessageBox({
+        type: 'error',
+        title: '更新检查失败',
+        message: '无法初始化更新器',
+        buttons: ['确定']
+      });
     }
   } catch (err) {
     log.error('检查更新失败:', err);
+    dialog.showMessageBox({
+      type: 'error',
+      title: '更新检查失败',
+      message: err.message,
+      buttons: ['确定']
+    });
   }
 }; 
