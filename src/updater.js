@@ -15,7 +15,7 @@ exports.initAutoUpdater = () => {
   try {
     updater = updateElectronApp({
       repo: 'cyf1215/guidewire-dev-tools',
-      updateInterval: '1 minute',  // 测试用，之后改回合适的间隔
+      updateInterval: '5 minute',  // 测试用，之后改回合适的间隔
       logger: log,
       notifyUser: false,
       onUpdateCheck: (status) => {
