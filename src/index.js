@@ -85,8 +85,10 @@ app.whenReady().then(async () => {
 
   createWindow();
 
-  // 初始化自动更新
-  initAutoUpdater();
+  // 确保在应用完全准备好后再初始化更新器
+  setTimeout(() => {
+    initAutoUpdater();
+  }, 3000);
 
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.

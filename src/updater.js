@@ -30,80 +30,62 @@ exports.initAutoUpdater = () => {
     return;
   }
 
-  updater = updateElectronApp({
-    logger: log,
-    repo: 'cyf1215/guidewire-dev-tools',
-    updateInterval: '1 hour',
-    enabled: getAutoUpdateEnabled(),
-    notifyUser: true,
-    onUpdateCheck: (status) => {
-      if (status.updateAvailable) {
+  try {
+    updater = updateElectronApp({
+      logger: log,
+      repo: 'cyf1215/guidewire-dev-tools',
+      updateInterval: '1 hour',
+      enabled: getAutoUpdateEnabled(),
+      notifyUser: false,  // 关闭默认通知，使用自定义通知
+      onUpdateCheck: (status) => {
+        if (!status) {
+          dialog.showMessageBox({
+            type: 'info',
+            title: '检查更新',
+            message: '当前已是最新版本',
+            detail: `当前版本: v${app.getVersion()}`,
+            buttons: ['确定']
+          });
+          return;
+        }
+
         dialog.showMessageBox({
           type: 'info',
           title: '发现新版本',
-          message: `发现新版本 v${status.updateInfo.version}`,
-          detail: `当前版本: v${app.getVersion()}\n最新版本: v${status.updateInfo.version}\n\n是否现在更新？`,
+          message: `发现新版本 v${status.version}`,
+          detail: `当前版本: v${app.getVersion()}\n最新版本: v${status.version}\n\n是否现在更新？`,
           buttons: ['更新', '稍后', '设置'],
           defaultId: 0
         }).then(({ response }) => {
           if (response === 0) {
-            status.downloadUpdate();
+            updater.downloadUpdate();
           } else if (response === 2) {
             showUpdateSettings();
           }
         });
-      } else {
-        dialog.showMessageBox({
-          type: 'info',
-          title: '检查更新',
-          message: '当前已是最新版本',
-          detail: `当前版本: v${app.getVersion()}`,
-          buttons: ['确定']
-        });
       }
-    },
-    onUpdateDownloaded: () => {
-      dialog.showMessageBox({
-        type: 'info',
-        title: '更新就绪',
-        message: '更新已下载完成',
-        detail: '重启应用以完成安装',
-        buttons: ['立即重启', '稍后'],
-        defaultId: 0
-      }).then(({ response }) => {
-        if (response === 0) {
-          updater.quitAndInstall();
-        }
-      });
-    },
-    onError: (error) => {
-      log.error('更新错误:', error);
-      // 如果不是找不到更新文件的错误，就显示错误对话框
-      if (!error.message.includes('latest.yml')) {
-        dialog.showErrorBox('更新检查失败', error.message);
-      }
-    }
-  });
+    });
 
-  return updater;
+    log.info('更新器初始化成功');
+  } catch (err) {
+    log.error('更新器初始化失败:', err);
+    dialog.showErrorBox('更新器初始化失败', err.message);
+  }
 };
 
 // 手动检查更新
 exports.checkForUpdates = async () => {
-  if (!updater) {
-    log.info('更新器未初始化');
-    dialog.showMessageBox({
-      type: 'error',
-      title: '更新检查失败',
-      message: '更新器未初始化',
-      detail: '请检查网络连接后重试',
-      buttons: ['确定']
-    });
-    return;
-  }
-
   try {
-    log.info('手动检查更新...');
+    if (!updater) {
+      log.info('更新器未初始化，正在初始化...');
+      exports.initAutoUpdater();
+    }
+    
+    if (!updater) {
+      throw new Error('更新器初始化失败');
+    }
+
+    log.info('正在检查更新...');
     await updater.checkForUpdates();
   } catch (err) {
     log.error('检查更新失败:', err);
