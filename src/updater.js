@@ -1,6 +1,6 @@
-const { dialog, app } = require('electron');
-const { updateElectronApp } = require('update-electron-app');
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 const log = require('electron-log');
+const { dialog, app } = require('electron');
 const Store = require('electron-store');
 
 // 创建配置存储实例
@@ -11,15 +11,7 @@ let updater = null;
 
 // 从存储中获取自动更新设置
 const getAutoUpdateEnabled = () => {
-  return store.get('autoUpdate', true); // 默认启用
-};
-
-// 设置自动更新开关
-exports.setAutoUpdate = (enabled) => {
-  store.set('autoUpdate', enabled);
-  log.info(`自动更新已${enabled ? '启用' : '禁用'}`);
-  // 重新初始化更新器
-  exports.initAutoUpdater();
+  return store.get('autoUpdate', true);
 };
 
 // 配置自动更新
@@ -32,11 +24,13 @@ exports.initAutoUpdater = () => {
 
   try {
     updater = updateElectronApp({
-      logger: log,
-      repo: 'cyf1215/guidewire-dev-tools',
-      updateInterval: '1 hour',
-      enabled: getAutoUpdateEnabled(),
-      notifyUser: false,  // 关闭默认通知，使用自定义通知
+      updateSource: {
+        type: UpdateSourceType.ElectronPublicUpdateService,
+        repo: 'cyf1215/guidewire-dev-tools'
+      },
+      updateInterval: '1 hour',  // 每小时检查一次更新
+      logger: log,  // 使用 electron-log 记录日志
+      notifyUser: false,  // 使用自定义通知
       onUpdateCheck: (status) => {
         if (!status) {
           dialog.showMessageBox({
@@ -69,7 +63,6 @@ exports.initAutoUpdater = () => {
     log.info('更新器初始化成功');
   } catch (err) {
     log.error('更新器初始化失败:', err);
-    dialog.showErrorBox('更新器初始化失败', err.message);
   }
 };
 
@@ -91,6 +84,14 @@ exports.checkForUpdates = async () => {
     log.error('检查更新失败:', err);
     dialog.showErrorBox('更新检查失败', err.message);
   }
+};
+
+// 设置自动更新开关
+exports.setAutoUpdate = (enabled) => {
+  store.set('autoUpdate', enabled);
+  log.info(`自动更新已${enabled ? '启用' : '禁用'}`);
+  // 重新初始化更新器
+  exports.initAutoUpdater();
 };
 
 // 显示更新设置对话框
