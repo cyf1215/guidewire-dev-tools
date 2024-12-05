@@ -1,4 +1,4 @@
-const { updateElectronApp } = require('update-electron-app');
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 const log = require('electron-log');
 const { dialog, app } = require('electron');
 
@@ -10,11 +10,9 @@ let updater = null;
 
 // 配置自动更新
 exports.initAutoUpdater = () => {
-  // 修改开发环境判断逻辑
   const isDev = !app.isPackaged;
   log.info('初始化更新器, 是否开发环境:', isDev, '应用版本:', app.getVersion());
 
-  // 在生产环境中才初始化更新器
   if (!isDev) {
     try {
       if (updater) {
@@ -23,10 +21,13 @@ exports.initAutoUpdater = () => {
       }
 
       updater = updateElectronApp({
-        repo: 'cyf1215/guidewire-dev-tools',
-        updateInterval: '5 minute',
+        updateSource: {
+          type: UpdateSourceType.ElectronPublicUpdateService,
+          repo: 'cyf1215/guidewire-dev-tools'
+        },
+        updateInterval: '5 minute',  // 测试用，之后改回合适的间隔
         logger: log,
-        notifyUser: false,
+        notifyUser: false,  // 使用自定义通知
         onUpdateCheck: (status) => {
           log.info('检查更新状态:', status);
           if (status === false) {
@@ -88,7 +89,6 @@ exports.checkForUpdates = async () => {
   try {
     log.info('开始手动检查更新...');
     
-    // 如果是开发环境，显示提示
     if (!app.isPackaged) {
       dialog.showMessageBox({
         type: 'info',
