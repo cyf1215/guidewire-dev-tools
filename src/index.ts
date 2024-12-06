@@ -1,30 +1,30 @@
-const { app, BrowserWindow, Menu } = require('electron');
-const path = require('node:path');
-const started = require('electron-squirrel-startup');
-const { initAutoUpdater } = require('./updater');
-const { template } = require('./menu');
+import { app, BrowserWindow, Menu } from 'electron';
+import * as path from 'path';
+import { initAutoUpdater } from './updater';
+import { template } from './menu';
 
-// 在文件顶部添加
-process.on('uncaughtException', (error) => {
+// 设置环境变量
+process.env.ELECTRON_ENABLE_LOGGING = 'false';
+
+// 错误处理
+process.on('uncaughtException', (error: Error) => {
   console.error('未捕获的异常:', error);
 });
 
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', (error: unknown) => {
   console.error('未处理的 Promise 拒绝:', error);
 });
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
+// 检查是否是 Squirrel 安装事件
+if (require('electron-squirrel-startup')) {
   if (process.platform === 'win32') {
     const squirrelCommand = process.argv[1];
     switch (squirrelCommand) {
       case '--squirrel-install':
       case '--squirrel-updated':
-        // 执行安装后的操作
         app.quit();
         break;
       case '--squirrel-uninstall':
-        // 执行卸载前的清理
         app.quit();
         break;
       case '--squirrel-obsolete':
@@ -35,7 +35,7 @@ if (started) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = (): void => {
   // 创建加载窗口
   const loadingWindow = new BrowserWindow({
     width: 300,
@@ -49,11 +49,11 @@ const createWindow = () => {
 
   loadingWindow.loadFile(path.join(__dirname, 'loading.html'));
 
-  // Create the browser window.
+  // 创建主窗口
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    show: false,  // 初始不显示
+    show: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -61,7 +61,7 @@ const createWindow = () => {
     },
   });
 
-  // 主窗口加载完成后
+  // 主窗口加载完成后的处理
   mainWindow.once('ready-to-show', () => {
     loadingWindow.close();
     mainWindow.show();
@@ -75,9 +75,7 @@ const createWindow = () => {
   }
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// 应用程序初始化
 app.whenReady().then(() => {
   // 初始化更新器
   initAutoUpdater();
@@ -95,25 +93,20 @@ app.whenReady().then(() => {
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// 窗口关闭处理
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
+// 开发模式热重载
 const isDev = process.env.NODE_ENV === 'development';
 
 if (isDev) {
   try {
     require('electron-reloader')(module);
-  } catch (_) {}
-}
-
-// 在文件最顶部添加
-process.env.ELECTRON_ENABLE_LOGGING = false;
+  } catch (_) {
+    // 忽略错误
+  }
+} 

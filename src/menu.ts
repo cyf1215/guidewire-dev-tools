@@ -1,7 +1,7 @@
-const { checkForUpdates } = require('./updater');
-const { app } = require('electron');
+import { MenuItemConstructorOptions, app } from 'electron';
+import { checkForUpdates } from './updater';
 
-const template = [
+const template: MenuItemConstructorOptions[] = [
   {
     label: '帮助',
     submenu: [
@@ -18,4 +18,4 @@ const template = [
   }
 ];
 
-exports.template = template; 
+export { template }; 
