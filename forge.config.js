@@ -26,6 +26,21 @@ module.exports = {
             "Publisher": "Ifan Cao",
             "DisplayVersion": "0.0.5"
           }
+        },
+        removeDefaultProgram: true,
+        deleteAppDataOnUninstall: true,
+        setupEvents: {
+          postInstall: [
+            {
+              command: 'powershell',
+              args: [
+                '-NoProfile',
+                '-ExecutionPolicy', 'Bypass',
+                '-Command',
+                'Get-ChildItem "$env:LOCALAPPDATA\\guidewire-dev-tools" -Directory -Filter "app-*" | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Remove-Item -Recurse -Force'
+              ]
+            }
+          ]
         }
       }
     },
