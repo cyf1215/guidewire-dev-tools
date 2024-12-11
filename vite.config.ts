@@ -1,22 +1,24 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { join } from 'path';
+import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  root: join(__dirname, 'src'),
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src/renderer')
+    }
+  },
+  root: resolve(__dirname, 'src/renderer'),
   base: './',
+  publicDir: resolve(__dirname, 'public'),
   build: {
-    outDir: join(__dirname, 'dist'),
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: join(__dirname, 'src/index.html'),
-      },
-    },
+    outDir: resolve(__dirname, 'dist'),
+    emptyOutDir: true
   },
   server: {
-    port: 3000,
-  },
-}); 
+    port: 5173,
+    strictPort: true
+  }
+});
