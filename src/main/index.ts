@@ -56,8 +56,8 @@ const createWindow = async (): Promise<void> => {
       frame: false,
       transparent: true,
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
+        nodeIntegration: false,
+        contextIsolation: true
       }
     });
     logger.info('加载窗口创建成功');
@@ -79,8 +79,8 @@ const createWindow = async (): Promise<void> => {
       height: 768,
       show: false,
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
+        nodeIntegration: false,
+        contextIsolation: true,
         webSecurity: false,
         preload: path.join(app.getAppPath(), 'dist/preload/index.js'),
       },

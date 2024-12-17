@@ -5,6 +5,7 @@
         <el-option label="OpenAI" value="openai" />
         <el-option label="DeepSeek" value="deepseek" />
         <el-option label="Ollama" value="ollama" />
+        <el-option label="Gemini" value="gemini" />
       </el-select>
       <el-button type="primary" link @click="goToSettings">
         <el-icon><Setting /></el-icon>
@@ -73,6 +74,7 @@ import 'github-markdown-css/github-markdown.css'
 import { ChatPromptTemplate } from "@langchain/core/prompts"
 import { RunnableSequence } from "@langchain/core/runnables"
 import { StringOutputParser } from "@langchain/core/output_parsers"
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 
 // 自定义内存接口
 interface CustomMemory {
@@ -196,6 +198,21 @@ function createChatModel(): BaseChatModel {
         configuration: {
           baseURL: "https://api.deepseek.com/v1",
         },
+        callbacks: [{
+          handleLLMNewToken(token: string) {
+            handleStreamResponse(token)
+          }
+        }]
+      })
+    case 'gemini':
+      return new ChatGoogleGenerativeAI({
+        modelName: localStorage.getItem('GEMINI_MODEL') || 'gemini-2.0-flash-exp',
+        apiKey: localStorage.getItem('GEMINI_API_KEY') || '',
+        streaming: true,
+        maxOutputTokens: Number(localStorage.getItem('GEMINI_MAX_TOKENS')) || 8192,
+        temperature: Number(localStorage.getItem('GEMINI_TEMPERATURE')) || 1.0,
+        topK: Number(localStorage.getItem('GEMINI_TOP_K')) || 40,
+        topP: Number(localStorage.getItem('GEMINI_TOP_P')) || 0.95,
         callbacks: [{
           handleLLMNewToken(token: string) {
             handleStreamResponse(token)
@@ -401,10 +418,21 @@ function handleModelChange(value: string) {
     ? localStorage.getItem('DEEPSEEK_API_KEY')
     : value === 'openai'
     ? localStorage.getItem('OPENAI_API_KEY')
+    : value === 'gemini'
+    ? localStorage.getItem('GEMINI_API_KEY')
     : null
 
-  if ((value === 'deepseek' || value === 'openai') && !apiKey) {
+  if ((value === 'deepseek' || value === 'openai' || value === 'gemini') && !apiKey) {
     showConfigMessage('warning', '请先配置 API Key')
+  }
+
+  // 检查 Gemini 的其他必要配置
+  if (value === 'gemini') {
+    const model = localStorage.getItem('GEMINI_MODEL')
+    if (!model) {
+      showConfigMessage('warning', '请先在设置中选择 Gemini 模型')
+      return
+    }
   }
 
   // 重新创建聊天模型实例

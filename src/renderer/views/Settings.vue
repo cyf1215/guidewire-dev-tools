@@ -26,6 +26,10 @@
             <el-icon><Connection /></el-icon>
             <span>Ollama 配置</span>
           </el-menu-item>
+          <el-menu-item index="gemini">
+            <el-icon><Key /></el-icon>
+            <span>Gemini 配置</span>
+          </el-menu-item>
         </el-menu>
       </div>
 
@@ -141,6 +145,67 @@
             </el-form>
           </div>
         </div>
+
+        <!-- Gemini 配置 -->
+        <div v-show="activeMenu === 'gemini'" class="settings-section">
+          <h3>Gemini 配置</h3>
+          <div class="settings-form">
+            <el-form label-position="top">
+              <el-form-item label="API Key">
+                <el-input
+                  v-model="form.geminiKey"
+                  type="password"
+                  show-password
+                  placeholder="sk-..."
+                  clearable
+                />
+                <div class="form-item-tip">
+                  在 Google AI Studio 获取 API Key：
+                  <el-link href="https://makersuite.google.com/app/apikey"
+                          type="primary"
+                          target="_blank">
+                    获取 API Key
+                  </el-link>
+                  <p>请先配置 API Key 才能使用 Gemini 模型</p>
+                </div>
+              </el-form-item>
+              <el-form-item label="模型">
+                <el-select v-model="form.geminiModel" placeholder="选择模型">
+                  <el-option label="gemini-2.0-flash-exp" value="gemini-2.0-flash-exp" />
+                  <el-option label="gemini-2.0-flash-attn" value="gemini-2.0-flash-attn" />
+                  <el-option label="gemini-2.0-flash-qkv" value="gemini-2.0-flash-qkv" />
+                  <el-option label="gemini-2.0-flash-attn-qkv" value="gemini-2.0-flash-attn-qkv" />
+                </el-select>
+                <div class="form-item-tip">
+                  <template v-if="form.geminiModel === 'gemini-2.0-flash-exp'">
+                    在各种任务中提供快速、多样化的性能
+                  </template>
+                  <template v-else-if="form.geminiModel === 'gemini-2.0-flash-attn'">
+                    量大且智能程度较低的任务
+                  </template>
+                  <template v-else-if="form.geminiModel === 'gemini-2.0-flash-qkv'">
+                    需要更多智能的复杂推理任务
+                  </template>
+                  <template v-else-if="form.geminiModel === 'gemini-2.0-flash-attn-qkv'">
+                    自然语言任务、多轮文本和代码对话以及代码生成
+                  </template>
+                </div>
+              </el-form-item>
+              <el-form-item label="最大令牌数">
+                <el-input-number v-model="form.geminiMaxTokens" :min="1" :max="16384" />
+              </el-form-item>
+              <el-form-item label="温度">
+                <el-input-number v-model="form.geminiTemperature" :min="0" :max="2" :step="0.1" />
+              </el-form-item>
+              <el-form-item label="Top K">
+                <el-input-number v-model="form.geminiTopK" :min="1" :max="100" />
+              </el-form-item>
+              <el-form-item label="Top P">
+                <el-input-number v-model="form.geminiTopP" :min="0" :max="1" :step="0.05" />
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -165,7 +230,13 @@ const form = ref({
   openaiModel: localStorage.getItem('OPENAI_MODEL') || 'gpt-3.5-turbo',
   deepseekKey: localStorage.getItem('DEEPSEEK_API_KEY') || '',
   ollamaUrl: localStorage.getItem('OLLAMA_BASE_URL') || 'http://localhost:11434',
-  ollamaModel: localStorage.getItem('OLLAMA_MODEL') || 'llama2'
+  ollamaModel: localStorage.getItem('OLLAMA_MODEL') || 'llama2',
+  geminiKey: localStorage.getItem('GEMINI_API_KEY') || '',
+  geminiModel: localStorage.getItem('GEMINI_MODEL') || 'gemini-2.0-flash-exp',
+  geminiMaxTokens: Number(localStorage.getItem('GEMINI_MAX_TOKENS')) || 8192,
+  geminiTemperature: Number(localStorage.getItem('GEMINI_TEMPERATURE')) || 1.0,
+  geminiTopK: Number(localStorage.getItem('GEMINI_TOP_K')) || 40,
+  geminiTopP: Number(localStorage.getItem('GEMINI_TOP_P')) || 0.95,
 })
 
 // 获取 Ollama 已安装的模型列表
@@ -213,6 +284,12 @@ function saveSettings() {
   localStorage.setItem('DEEPSEEK_API_KEY', form.value.deepseekKey)
   localStorage.setItem('OLLAMA_BASE_URL', form.value.ollamaUrl)
   localStorage.setItem('OLLAMA_MODEL', form.value.ollamaModel)
+  localStorage.setItem('GEMINI_API_KEY', form.value.geminiKey)
+  localStorage.setItem('GEMINI_MODEL', form.value.geminiModel)
+  localStorage.setItem('GEMINI_MAX_TOKENS', form.value.geminiMaxTokens.toString())
+  localStorage.setItem('GEMINI_TEMPERATURE', form.value.geminiTemperature.toString())
+  localStorage.setItem('GEMINI_TOP_K', form.value.geminiTopK.toString())
+  localStorage.setItem('GEMINI_TOP_P', form.value.geminiTopP.toString())
   ElMessage.success('设置已保存')
 }
 
