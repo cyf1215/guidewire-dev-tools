@@ -45,7 +45,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           // 渲染进程 HTML 入口文件
-          index: resolve(__dirname, 'src/renderer/index.html')
+          index: resolve(__dirname, 'src/renderer/index.html'),
+          loading: resolve(__dirname, 'src/renderer/loading.html')
         }
       }
     },

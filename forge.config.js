@@ -24,18 +24,26 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
+        name: 'guidewire_dev_tools',
+        authors: 'Ifan Cao',
+        exe: 'GuidewireDevTools.exe',
         setupIcon: './assets/icon.ico',
         iconUrl: 'https://raw.githubusercontent.com/cyf1215/guidewire-dev-tools/main/assets/icon.ico',
         loadingGif: './assets/installing.gif',
-        setupExe: 'Guidewire Dev Tools Setup.exe',
+        setupExe: 'GuidewireDevToolsSetup.exe',
+        remoteReleases: 'https://github.com/cyf1215/guidewire-dev-tools/releases/latest',
+        noDelta: true,
+        setupMsi: 'GuidewireDevToolsSetup.msi',
+        noMsi: false,
         registryKeys: {
           "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\GuidewireDevTools": {
-            "DisplayName": "Guidewire Dev Tools",
-            "DisplayIcon": "%INSTALLPATH%\\Guidewire Dev Tools.exe",
-            "UninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe",
-            "QuietUninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe --uninstall -s",
+            "DisplayName": "GuidewireDevTools",
+            "DisplayIcon": "%INSTALLPATH%\\GuidewireDevTools.exe",
+            "UninstallString": "%INSTALLPATH%\\UninstallGuidewireDevTools.exe",
+            "QuietUninstallString": "%INSTALLPATH%\\UninstallGuidewireDevTools.exe --uninstall -s",
             "Publisher": "Ifan Cao",
-            "DisplayVersion": pkg.version
+            "DisplayVersion": pkg.version,
+            "InstallLocation": "%INSTALLPATH%"
           }
         }
       }

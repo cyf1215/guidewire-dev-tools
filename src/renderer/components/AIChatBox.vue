@@ -462,7 +462,7 @@ onMounted(() => {
   // 检查 API Key
   const deepseekKey = localStorage.getItem('DEEPSEEK_API_KEY')
   if (!deepseekKey) {
-    showConfigMessage('warning', '请先在设置页��配置 DeepSeek API Key')
+    showConfigMessage('warning', '请先在设置页配置 DeepSeek API Key')
   }
 
   scrollToBottom()

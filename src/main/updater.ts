@@ -1,124 +1,162 @@
-import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
+import { autoUpdater } from 'electron';
 import log from 'electron-log';
 import { dialog, app } from 'electron';
 import { EventEmitter } from 'events';
+import * as path from 'path';
 
 // 配置日志输出格式
 log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}] [{level}] {text}';
 
-interface UpdateStatus {
+interface UpdateInfo {
   version: string;
+  releaseNotes?: string;
 }
 
 class Updater extends EventEmitter {
-  private updateInstance: any;
+  private initialized: boolean = false;
 
   constructor() {
     super();
-    this.updateInstance = null;
+    this.setupAutoUpdater();
+  }
+
+  private setupAutoUpdater(): void {
+    if (process.platform === 'win32') {
+      try {
+        // Windows 平台使用 Squirrel.Windows
+        const server = 'https://github.com/cyf1215/guidewire-dev-tools';
+        const url = `${server}/releases/latest/download/RELEASES`;
+
+        log.info('设置更新服务器:', url);
+        autoUpdater.setFeedURL({
+          url,
+          headers: {
+            'User-Agent': 'Guidewire Dev Tools'
+          }
+        });
+
+        // 配置更新事件处理
+        autoUpdater.on('error', (err: Error) => {
+          log.error('更新错误:', err);
+          this.emit('error', err);
+        });
+
+        autoUpdater.on('checking-for-update', () => {
+          log.info('正在检查更新...');
+          this.emit('checking-for-update');
+        });
+
+        autoUpdater.on('update-available', () => {
+          log.info('发现新版本');
+          dialog.showMessageBox({
+            type: 'info',
+            title: '发现新版本',
+            message: '发现新版本，是否更新？',
+            detail: `当前版本: ${app.getVersion()}`,
+            buttons: ['更新', '稍后']
+          }).then(({ response }) => {
+            if (response === 0) {
+              this.emit('update-available');
+            }
+          });
+        });
+
+        autoUpdater.on('update-not-available', () => {
+          log.info('当前已是最新版本');
+          dialog.showMessageBox({
+            type: 'info',
+            title: '检查更新',
+            message: '当前已是最新版本',
+            detail: `当前版本: ${app.getVersion()}`,
+            buttons: ['确定']
+          });
+          this.emit('update-not-available');
+        });
+
+        autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+          log.info('更新下载完成:', { releaseNotes, releaseName });
+          dialog.showMessageBox({
+            type: 'info',
+            title: '安装更新',
+            message: '更新已下载完成',
+            detail: `版本: ${releaseName}\n\n更新说明:\n${releaseNotes}\n\n是否立即重启应用以完成安装？`,
+            buttons: ['重启', '稍后']
+          }).then(({ response }) => {
+            if (response === 0) {
+              autoUpdater.quitAndInstall();
+            }
+          });
+          this.emit('update-downloaded');
+        });
+
+        this.initialized = true;
+        log.info('更新器初始化完成');
+      } catch (err) {
+        log.error('更新器初始化失败:', err);
+        this.initialized = false;
+      }
+    } else {
+      log.warn('当前平台不支持自动更新');
+    }
   }
 
   init(): void {
-    this.updateInstance = updateElectronApp({
-      updateSource: {
-        type: UpdateSourceType.ElectronPublicUpdateService,
-        host: 'https://github.com',
-        repo: 'cyf1215/guidewire-dev-tools',
-        updatePath: 'releases/download'
-      },
-      updateInterval: '1 hour',
-      logger: log,
-      notifyUser: false,
-      debug: true
-    });
+    try {
+      log.info('正在初始化更新器...');
 
-    if (this.updateInstance && this.updateInstance.on) {
-      this.updateInstance.on('error', (err: Error) => {
-        log.error('更新器错误:', err);
-        log.error('错误堆栈:', err.stack);
-      });
+      if (!this.initialized) {
+        log.warn('更新器未初始化，当前平台可能不支持自动更新');
+        return;
+      }
+
+      // 设置自动检查更新间隔
+      setInterval(() => {
+        this.checkForUpdates().catch(err => {
+          log.error('自动检查更新失败:', err);
+        });
+      }, 60 * 60 * 1000); // 每小时检查一次
+
+      // 启动时检查一次更新
+      setTimeout(() => {
+        this.checkForUpdates().catch(err => {
+          log.error('初始检查更新失败:', err);
+        });
+      }, 10000); // 延迟10秒检查，确保应用完全启动
+
+      log.info('更新器初始化完成');
+    } catch (err) {
+      log.error('更新器初始化失败:', err);
+      throw err;
     }
   }
 
   async checkForUpdates(): Promise<void> {
-    if (this.updateInstance && this.updateInstance.checkForUpdates) {
-      await this.updateInstance.checkForUpdates();
-    }
-  }
+    try {
+      if (!this.initialized) {
+        throw new Error('更新器未初始化或当前平台不支持自动更新');
+      }
 
-  downloadUpdate(): void {
-    if (this.updateInstance && this.updateInstance.downloadUpdate) {
-      this.updateInstance.downloadUpdate();
-    }
-  }
-
-  quitAndInstall(): void {
-    if (this.updateInstance && this.updateInstance.quitAndInstall) {
-      this.updateInstance.quitAndInstall();
+      log.info('正在检查更新...');
+      await autoUpdater.checkForUpdates();
+    } catch (err) {
+      log.error('检查更新失败:', err);
+      throw err;
     }
   }
 }
 
 let updater: Updater | null = null;
 
-// 配置自动更新
 export const initAutoUpdater = (): Updater | null => {
   const isDev = !app.isPackaged;
   log.info('初始化更新器, 是否开发环境:', isDev, '应用版本:', app.getVersion());
 
   if (!isDev) {
     try {
-      if (updater) {
-        log.info('更新器已经初始化');
-        return updater;
+      if (!updater) {
+        updater = new Updater();
+        updater.init();
       }
-
-      updater = new Updater();
-      updater.init();
-
-      // 监听更新事件
-      updater.on('update-available', (status: UpdateStatus) => {
-        log.info('检查更新状态:', status);
-        dialog.showMessageBox({
-          type: 'info',
-          title: '发现新版本',
-          message: `发现新版本 v${status.version}`,
-          detail: `当前版本: v${app.getVersion()}\n最新版本: v${status.version}\n\n是否现在更新？`,
-          buttons: ['更新', '稍后'],
-          defaultId: 0
-        }).then(({ response }) => {
-          if (response === 0) {
-            updater?.downloadUpdate();
-          }
-        });
-      });
-
-      updater.on('update-not-available', () => {
-        log.info('没有可用的更新');
-        dialog.showMessageBox({
-          type: 'info',
-          title: '检查更新',
-          message: '当前已是最新版本',
-          buttons: ['确定']
-        });
-      });
-
-      updater.on('update-downloaded', () => {
-        dialog.showMessageBox({
-          type: 'info',
-          title: '更新就绪',
-          message: '更新已下载完成',
-          detail: '重启应用以完成安装',
-          buttons: ['立即重启', '稍后'],
-          defaultId: 0
-        }).then(({ response }) => {
-          if (response === 0) {
-            updater?.quitAndInstall();
-          }
-        });
-      });
-
-      log.info('更新器初始化成功');
       return updater;
     } catch (err) {
       log.error('更新器初始化失败:', err);
@@ -130,11 +168,8 @@ export const initAutoUpdater = (): Updater | null => {
   }
 };
 
-// 手动检查更新
 export const checkForUpdates = async (): Promise<void> => {
   try {
-    log.info('开始手动检查更新...');
-
     if (!app.isPackaged) {
       dialog.showMessageBox({
         type: 'info',
@@ -152,17 +187,9 @@ export const checkForUpdates = async (): Promise<void> => {
     }
 
     if (updater) {
-      log.info('正在执行更新检查...');
       await updater.checkForUpdates();
     } else {
-      log.warn('更新器初始化失败，无法检查更新');
-      dialog.showMessageBox({
-        type: 'error',
-        title: '更新检查失败',
-        message: '无法初始化更新器',
-        detail: '请确保应用已正确打包并且不在开发环境中运行',
-        buttons: ['确定']
-      });
+      throw new Error('无法初始化更新器');
     }
   } catch (err) {
     log.error('检查更新失败:', err);

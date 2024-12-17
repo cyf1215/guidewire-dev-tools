@@ -1,6 +1,6 @@
 {
   "name": "guidewire-dev-tools",
-  "productName": "Guidewire Dev Tools",
+  "productName": "GuidewireDevTools",
   "version": "0.0.26",
   "description": "A development toolkit for Guidewire applications",
   "keywords": [
@@ -133,6 +133,7 @@
     "protocol": "https",
     "host": "github.com",
     "updateProvider": "github",
-    "updaterCacheDirName": "guidewire-dev-tools-updater"
+    "updaterCacheDirName": "guidewire-dev-tools-updater",
+    "releaseAssets": ["RELEASES", "*.nupkg", "*.exe", "*.msi"]
   }
 }

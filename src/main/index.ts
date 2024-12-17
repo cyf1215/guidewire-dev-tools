@@ -5,21 +5,33 @@ import { initAutoUpdater, checkForUpdates } from './updater';
 import { template } from './menu';
 import { DevToolsService } from '../services/devtools';
 
+// 配置日志
+logger.transports.file.level = 'debug';
+logger.transports.console.level = 'debug';
+logger.catchErrors();
+
+// 记录基本信息
+logger.info('应用启动');
+logger.info(`应用版本: ${app.getVersion()}`);
+logger.info(`运行环境: ${process.env.NODE_ENV}`);
+logger.info(`可执行文件路径: ${app.getPath('exe')}`);
+logger.info(`用户数据路径: ${app.getPath('userData')}`);
+
 // 错误处理
 process.on('uncaughtException', (error: Error) => {
-  logger.error('Uncaught Exception:', error);
+  logger.error('未捕获的异常:', error);
   logger.error('错误堆栈:', error.stack);
   app.quit();
 });
 
 process.on('unhandledRejection', (error: unknown) => {
-  logger.error('Unhandled Promise Rejection:', error);
+  logger.error('未处理的 Promise 拒绝:', error);
   logger.error('错误详情:', error);
 });
 
 // 检查是否是 Squirrel 安装事件
 if (require('electron-squirrel-startup')) {
-  logger.info('Handling Squirrel startup event');
+  logger.info('处理 Squirrel 启动事件');
   app.quit();
 }
 
@@ -28,9 +40,14 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = async (): Promise<void> => {
   try {
-    logger.info('开始创建窗口, 应用版本:', app.getVersion());
+    logger.info('开始创建窗口');
     logger.info('应用路径:', app.getAppPath());
-    logger.info('用户数据路径:', app.getPath('userData'));
+
+    // 开发环境下打开开发者工具
+    if (!app.isPackaged) {
+      require('electron-debug')({ showDevTools: true });
+      logger.info('开发环境：已启用开发者工具');
+    }
 
     // 创建加载窗口
     const loadingWindow = new BrowserWindow({
@@ -39,7 +56,8 @@ const createWindow = async (): Promise<void> => {
       frame: false,
       transparent: true,
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        contextIsolation: false
       }
     });
     logger.info('加载窗口创建成功');
@@ -49,7 +67,7 @@ const createWindow = async (): Promise<void> => {
       logger.info('加载开发环境loading页面');
       await loadingWindow.loadURL('http://localhost:5173/loading.html');
     } else {
-      const loadingPath = path.join(__dirname, '../renderer/loading.html');
+      const loadingPath = path.join(app.getAppPath(), 'dist/renderer/loading.html');
       logger.info('加载生产环境loading页面:', loadingPath);
       await loadingWindow.loadFile(loadingPath);
     }
@@ -61,9 +79,10 @@ const createWindow = async (): Promise<void> => {
       height: 768,
       show: false,
       webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: path.join(__dirname, '../preload/index.js'),
+        nodeIntegration: true,
+        contextIsolation: false,
+        webSecurity: false,
+        preload: path.join(app.getAppPath(), 'dist/preload/index.js'),
       },
     });
     logger.info('主窗口创建成功');
@@ -94,7 +113,7 @@ const createWindow = async (): Promise<void> => {
       mainWindow.webContents.openDevTools();
       logger.info('开发者工具已打开');
     } else {
-      const mainPath = path.join(__dirname, '../renderer/index.html');
+      const mainPath = path.join(app.getAppPath(), 'dist/renderer/index.html');
       logger.info('加载生产环境主页面:', mainPath);
       await mainWindow.loadFile(mainPath);
     }
