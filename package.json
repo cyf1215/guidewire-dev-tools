@@ -27,7 +27,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "main": "out/main/index.js",
+  "main": "dist/main/index.js",
   "scripts": {
     "start": "chcp 65001 && electron-vite dev",
     "build": "electron-vite build",
@@ -41,7 +41,14 @@
     "lint:fix": "eslint . --ext .ts,.vue --fix",
     "format": "prettier --write \"src/**/*.{ts,vue}\"",
     "clean": "rimraf out dist",
-    "release": "npm version patch && npm run publish"
+    "release": "npm run release:patch",
+    "release:patch": "git add . && git commit -m \"chore: prepare for release\" && git pull && npm version patch && git push && git push --tags && npm run publish",
+    "release:minor": "git add . && git commit -m \"chore: prepare for release\" && git pull && npm version minor && git push && git push --tags && npm run publish",
+    "release:major": "git add . && git commit -m \"chore: prepare for release\" && git pull && npm version major && git push && git push --tags && npm run publish",
+    "release:beta": "npm version prerelease --preid=beta && npm run publish",
+    "publish:all": "electron-forge publish --arch=x64,arm64",
+    "package:debug": "set DEBUG=electron-forge:* && npm run build && npm run check-files && electron-forge package",
+    "check-files": "node scripts/check-build.js"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.0",
@@ -101,7 +108,11 @@
     "vue-tsc": "^2.1.10"
   },
   "config": {
-    "autoUpdate": true
+    "autoUpdate": true,
+    "updateCheckInterval": "1 hour",
+    "updateChannel": "latest",
+    "electron_mirror": "https://npmmirror.com/mirrors/electron/",
+    "electron_builder_binaries_mirror": "https://npmmirror.com/mirrors/electron-builder-binaries/"
   },
   "publish": {
     "provider": "github",

@@ -1,10 +1,23 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const pkg = require('./package.json');
+const path = require('path');
 
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: './assets/icon'
+    icon: './assets/icon',
+    ignore: [],
+    overwrite: true,
+    prune: true,
+    derefSymlinks: true,
+    win32metadata: {
+      CompanyName: 'Capgemini',
+      FileDescription: pkg.description,
+      OriginalFilename: pkg.productName,
+      ProductName: pkg.productName,
+      InternalName: pkg.name
+    }
   },
   rebuildConfig: {},
   makers: [
@@ -15,8 +28,6 @@ module.exports = {
         iconUrl: 'https://raw.githubusercontent.com/cyf1215/guidewire-dev-tools/main/assets/icon.ico',
         loadingGif: './assets/installing.gif',
         setupExe: 'Guidewire Dev Tools Setup.exe',
-        setupExeDir: '.',
-        noMsi: true,
         registryKeys: {
           "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\GuidewireDevTools": {
             "DisplayName": "Guidewire Dev Tools",
@@ -24,50 +35,23 @@ module.exports = {
             "UninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe",
             "QuietUninstallString": "%INSTALLPATH%\\Uninstall Guidewire Dev Tools.exe --uninstall -s",
             "Publisher": "Ifan Cao",
-            "DisplayVersion": "0.0.5"
+            "DisplayVersion": pkg.version
           }
-        },
-        removeDefaultProgram: true,
-        deleteAppDataOnUninstall: true,
-        setupEvents: {
-          postInstall: [
-            {
-              command: 'powershell',
-              args: [
-                '-NoProfile',
-                '-ExecutionPolicy', 'Bypass',
-                '-Command',
-                'Get-ChildItem "$env:LOCALAPPDATA\\guidewire-dev-tools" -Directory -Filter "app-*" | Sort-Object CreationTime -Descending | Select-Object -Skip 1 | Remove-Item -Recurse -Force'
-              ]
-            }
-          ]
         }
       }
     },
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
+      platforms: ['win32']
+    }
   ],
   plugins: [
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: false,
-      [FuseV1Options.EnableCookieEncryption]: true,
       [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
       [FuseV1Options.EnableNodeCliInspectArguments]: false,
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
