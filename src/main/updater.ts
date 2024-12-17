@@ -24,12 +24,20 @@ class Updater extends EventEmitter {
         type: UpdateSourceType.ElectronPublicUpdateService,
         host: 'https://github.com',
         repo: 'cyf1215/guidewire-dev-tools',
-        updatePath: 'releases/latest'
+        updatePath: 'releases/download'
       },
-      updateInterval: '1 hour',  // 改回正常的更新间隔
+      updateInterval: '1 hour',
       logger: log,
-      notifyUser: false  // 使用自定义通知
+      notifyUser: false,
+      debug: true
     });
+
+    if (this.updateInstance && this.updateInstance.on) {
+      this.updateInstance.on('error', (err: Error) => {
+        log.error('更新器错误:', err);
+        log.error('错误堆栈:', err.stack);
+      });
+    }
   }
 
   async checkForUpdates(): Promise<void> {

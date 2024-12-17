@@ -112,7 +112,17 @@
     "updateCheckInterval": "1 hour",
     "updateChannel": "latest",
     "electron_mirror": "https://npmmirror.com/mirrors/electron/",
-    "electron_builder_binaries_mirror": "https://npmmirror.com/mirrors/electron-builder-binaries/"
+    "electron_builder_binaries_mirror": "https://npmmirror.com/mirrors/electron-builder-binaries/",
+    "forge": {
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "guidewire_dev_tools"
+          }
+        }
+      ]
+    }
   },
   "publish": {
     "provider": "github",
@@ -121,6 +131,8 @@
     "releaseType": "release",
     "private": false,
     "protocol": "https",
-    "host": "github.com"
+    "host": "github.com",
+    "updateProvider": "github",
+    "updaterCacheDirName": "guidewire-dev-tools-updater"
   }
 }
