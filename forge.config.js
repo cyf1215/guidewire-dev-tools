@@ -74,11 +74,8 @@ module.exports = {
           owner: 'cyf1215',
           name: 'guidewire-dev-tools'
         },
-        authToken: process.env.GITHUB_TOKEN,
         prerelease: false,
-        draft: false,
-        tagPrefix: 'v',
-        releaseType: 'release'
+        draft: false
       }
     }
   ]
