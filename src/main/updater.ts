@@ -22,6 +22,7 @@ class Updater extends EventEmitter {
     this.updateInstance = updateElectronApp({
       updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
+        host: 'https://github.com',
         repo: 'cyf1215/guidewire-dev-tools'
       },
       updateInterval: '5 minute',  // 测试用，之后改回合适的间隔
@@ -124,7 +125,7 @@ export const initAutoUpdater = (): Updater | null => {
 export const checkForUpdates = async (): Promise<void> => {
   try {
     log.info('开始手动检查更新...');
-    
+
     if (!app.isPackaged) {
       dialog.showMessageBox({
         type: 'info',
@@ -135,12 +136,12 @@ export const checkForUpdates = async (): Promise<void> => {
       });
       return;
     }
-    
+
     if (!updater) {
       log.info('更新器未初始化，正在初始化...');
       updater = initAutoUpdater();
     }
-    
+
     if (updater) {
       log.info('正在执行更新检查...');
       await updater.checkForUpdates();
@@ -163,4 +164,4 @@ export const checkForUpdates = async (): Promise<void> => {
       buttons: ['确定']
     });
   }
-}; 
+};
