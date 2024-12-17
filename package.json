@@ -116,6 +116,11 @@
   },
   "publish": {
     "provider": "github",
-    "releaseType": "release"
+    "owner": "cyf1215",
+    "repo": "guidewire-dev-tools",
+    "releaseType": "release",
+    "private": false,
+    "protocol": "https",
+    "host": "github.com"
   }
 }

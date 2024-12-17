@@ -23,9 +23,10 @@ class Updater extends EventEmitter {
       updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
         host: 'https://github.com',
-        repo: 'cyf1215/guidewire-dev-tools'
+        repo: 'cyf1215/guidewire-dev-tools',
+        updatePath: 'releases/latest'
       },
-      updateInterval: '5 minute',  // 测试用，之后改回合适的间隔
+      updateInterval: '1 hour',  // 改回正常的更新间隔
       logger: log,
       notifyUser: false  // 使用自定义通知
     });
