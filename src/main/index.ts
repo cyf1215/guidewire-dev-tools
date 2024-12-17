@@ -8,13 +8,13 @@ import { DevToolsService } from '../services/devtools';
 // 错误处理
 process.on('uncaughtException', (error: Error) => {
   logger.error('Uncaught Exception:', error);
-  logger.error('错误堆栈:', error.stack);  // 添加错误堆栈信息
+  logger.error('错误堆栈:', error.stack);
   app.quit();
 });
 
 process.on('unhandledRejection', (error: unknown) => {
   logger.error('Unhandled Promise Rejection:', error);
-  logger.error('错误详情:', error);  // 添加详细错误信息
+  logger.error('错误详情:', error);
 });
 
 // 检查是否是 Squirrel 安装事件
@@ -28,7 +28,10 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = async (): Promise<void> => {
   try {
-    logger.info('开始创建窗口');  // 添加日志
+    logger.info('开始创建窗口, 应用版本:', app.getVersion());
+    logger.info('应用路径:', app.getAppPath());
+    logger.info('用户数据路径:', app.getPath('userData'));
+
     // 创建加载窗口
     const loadingWindow = new BrowserWindow({
       width: 300,
@@ -39,15 +42,18 @@ const createWindow = async (): Promise<void> => {
         nodeIntegration: true
       }
     });
+    logger.info('加载窗口创建成功');
 
     // 在开发模式下使用 Vite 开发服务器
     if (process.env.NODE_ENV === 'development') {
-      logger.info('加载开发环境loading页面');  // 添加日志
+      logger.info('加载开发环境loading页面');
       await loadingWindow.loadURL('http://localhost:5173/loading.html');
     } else {
-      logger.info('加载生产环境loading页面');  // 添加日志
-      await loadingWindow.loadFile(path.join(__dirname, '../renderer/loading.html'));
+      const loadingPath = path.join(__dirname, '../renderer/loading.html');
+      logger.info('加载生产环境loading页面:', loadingPath);
+      await loadingWindow.loadFile(loadingPath);
     }
+    logger.info('加载页面加载完成');
 
     // 创建主窗口
     mainWindow = new BrowserWindow({
@@ -60,33 +66,47 @@ const createWindow = async (): Promise<void> => {
         preload: path.join(__dirname, '../preload/index.js'),
       },
     });
+    logger.info('主窗口创建成功');
 
     // 主窗口加载完成后的处理
     mainWindow.once('ready-to-show', () => {
       loadingWindow.close();
       mainWindow?.show();
-      logger.info('Main window is now visible');
+      logger.info('主窗口显示成功');
+    });
+
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+      logger.error('页面加载失败:', {
+        errorCode,
+        errorDescription,
+        url: mainWindow?.webContents.getURL()
+      });
+    });
+
+    mainWindow.webContents.on('did-finish-load', () => {
+      logger.info('主页面加载完成');
     });
 
     // 在开发模式下使用 Vite 开发服务器
     if (process.env.NODE_ENV === 'development') {
-      logger.info('加载开发环境主页面');  // 添加日志
+      logger.info('加载开发环境主页面');
       await mainWindow.loadURL('http://localhost:5173');
       mainWindow.webContents.openDevTools();
-      logger.info('DevTools opened in development mode');
+      logger.info('开发者工具已打开');
     } else {
-      logger.info('加载生产环境主页面');  // 添加日志
-      await mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+      const mainPath = path.join(__dirname, '../renderer/index.html');
+      logger.info('加载生产环境主页面:', mainPath);
+      await mainWindow.loadFile(mainPath);
     }
 
     // 窗口关闭事件处理
     mainWindow.on('closed', () => {
       mainWindow = null;
-      logger.info('Main window closed');
+      logger.info('主窗口已关闭');
     });
   } catch (error) {
     logger.error('创建窗口时出错:', error);
-    logger.error('错误堆栈:', error instanceof Error ? error.stack : '未知错误');  // 添加错误堆栈信息
+    logger.error('错误堆栈:', error instanceof Error ? error.stack : '未知错误');
     app.quit();
   }
 };
