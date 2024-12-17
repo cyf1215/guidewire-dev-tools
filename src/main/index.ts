@@ -8,11 +8,13 @@ import { DevToolsService } from '../services/devtools';
 // 错误处理
 process.on('uncaughtException', (error: Error) => {
   logger.error('Uncaught Exception:', error);
+  logger.error('错误堆栈:', error.stack);  // 添加错误堆栈信息
   app.quit();
 });
 
 process.on('unhandledRejection', (error: unknown) => {
   logger.error('Unhandled Promise Rejection:', error);
+  logger.error('错误详情:', error);  // 添加详细错误信息
 });
 
 // 检查是否是 Squirrel 安装事件
@@ -26,6 +28,7 @@ let mainWindow: BrowserWindow | null = null;
 
 const createWindow = async (): Promise<void> => {
   try {
+    logger.info('开始创建窗口');  // 添加日志
     // 创建加载窗口
     const loadingWindow = new BrowserWindow({
       width: 300,
@@ -39,8 +42,10 @@ const createWindow = async (): Promise<void> => {
 
     // 在开发模式下使用 Vite 开发服务器
     if (process.env.NODE_ENV === 'development') {
+      logger.info('加载开发环境loading页面');  // 添加日志
       await loadingWindow.loadURL('http://localhost:5173/loading.html');
     } else {
+      logger.info('加载生产环境loading页面');  // 添加日志
       await loadingWindow.loadFile(path.join(__dirname, '../renderer/loading.html'));
     }
 
@@ -65,10 +70,12 @@ const createWindow = async (): Promise<void> => {
 
     // 在开发模式下使用 Vite 开发服务器
     if (process.env.NODE_ENV === 'development') {
+      logger.info('加载开发环境主页面');  // 添加日志
       await mainWindow.loadURL('http://localhost:5173');
       mainWindow.webContents.openDevTools();
       logger.info('DevTools opened in development mode');
     } else {
+      logger.info('加载生产环境主页面');  // 添加日志
       await mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
     }
 
@@ -79,122 +86,35 @@ const createWindow = async (): Promise<void> => {
     });
   } catch (error) {
     logger.error('创建窗口时出错:', error);
+    logger.error('错误堆栈:', error instanceof Error ? error.stack : '未知错误');  // 添加错误堆栈信息
     app.quit();
   }
 };
 
-// 应用程序初始化
+// 应用程序准备就绪时创建窗口
 app.whenReady().then(async () => {
-  try {
-    logger.info('Application starting up', {
-      autoUpdate: process.env.AUTO_UPDATE === 'true',
-      version: app.getVersion()
-    });
-    
-    // 初始化更新器
-    initAutoUpdater();
-    
-    await createWindow();
-    
-    // 设置菜单
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+  logger.info('Electron初始化完成');
 
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-      }
-    });
+  try {
+    await initAutoUpdater();
+    logger.info('自动更新初始化完成');
   } catch (error) {
-    logger.error('Failed to initialize application:', error);
-    app.quit();
+    logger.error('自动更新初始化失败:', error);
   }
+
+  createWindow();
 });
 
-// 窗口关闭处理
+// 所有窗口关闭时退出应用
 app.on('window-all-closed', () => {
+  logger.info('所有窗口已关闭');
   if (process.platform !== 'darwin') {
-    logger.info('All windows closed, quitting application');
     app.quit();
   }
 });
 
-// 开发模式热重载
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  try {
-    require('electron-reloader')(module);
-    logger.info('Development hot reload enabled');
-  } catch (error) {
-    logger.warn('Failed to enable hot reload:', error);
-  }
-}
-
-// 添加 IPC 处理
-ipcMain.handle('check-for-updates', async () => {
-  try {
-    await checkForUpdates();
-  } catch (error) {
-    logger.error('检查更新失败:', error);
-    throw error;
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });
-
-ipcMain.handle('get-app-version', () => {
-  return app.getVersion();
-});
-
-ipcMain.handle('get-app-path', () => {
-  return app.getAppPath();
-});
-
-ipcMain.handle('open-dev-tools', () => {
-  if (mainWindow) {
-    mainWindow.webContents.openDevTools();
-  }
-});
-
-ipcMain.handle('close-dev-tools', () => {
-  if (mainWindow) {
-    mainWindow.webContents.closeDevTools();
-  }
-});
-
-ipcMain.handle('reload-app', () => {
-  if (mainWindow) {
-    mainWindow.reload();
-  }
-});
-
-// React DevTools 相关处理
-ipcMain.handle('install-react-devtools', async () => {
-  try {
-    const devToolsService = DevToolsService.getInstance();
-    await devToolsService.installReactDevTools();
-    if (mainWindow) {
-      mainWindow.reload();
-    }
-  } catch (error) {
-    logger.error('安装 React DevTools 失败:', error);
-    throw error;
-  }
-});
-
-ipcMain.handle('uninstall-react-devtools', async () => {
-  try {
-    const devToolsService = DevToolsService.getInstance();
-    await devToolsService.uninstallReactDevTools();
-    if (mainWindow) {
-      mainWindow.reload();
-    }
-  } catch (error) {
-    logger.error('卸载 React DevTools 失败:', error);
-    throw error;
-  }
-});
-
-ipcMain.handle('is-react-devtools-installed', () => {
-  const devToolsService = DevToolsService.getInstance();
-  return devToolsService.isInstalled();
-}); 
