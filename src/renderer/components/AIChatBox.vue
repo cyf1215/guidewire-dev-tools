@@ -55,7 +55,7 @@
         :rows="inputRows"
         placeholder="输入消息... (Shift + Enter 换行，Enter 发送)"
         resize="none"
-        @keydown.enter.prevent="handleKeyDown"
+        @keydown.enter="handleKeyDown"
       >
         <template #append>
           <el-button @click="sendMessage" :loading="loading">发送</el-button>
@@ -125,7 +125,12 @@ const messagesRef = ref<HTMLElement>();
 // 计算属性
 const inputRows = computed(() => {
   const lines = userInput.value.split('\n').length;
-  return Math.min(Math.max(2, lines), 5);
+  const minRows = 2;
+  const maxRows = 8; // 增加最大行数
+  // 根据内容长度自动调整
+  const contentLength = userInput.value.length;
+  const additionalRows = Math.floor(contentLength / 50); // 每50个字符增加一行
+  return Math.min(Math.max(minRows, lines + additionalRows), maxRows);
 });
 
 // Markdown 渲染函数
@@ -150,7 +155,11 @@ function renderMarkdown(text: string) {
 // 键盘事件处理
 function handleKeyDown(e: Event) {
   const event = e as KeyboardEvent;
-  if (!event.shiftKey) {
+  if (event.shiftKey && event.key === 'Enter') {
+    // Shift+Enter 换行，不阻止默认行为
+    return;
+  }
+  if (event.key === 'Enter' && !event.shiftKey) {
     e.preventDefault();
     sendMessage();
   }
@@ -685,6 +694,38 @@ onUnmounted(() => {
 .chat-input {
   padding: 20px;
   background-color: #fff;
+  border-top: 1px solid #ebeef5;
+}
+
+:deep(.el-textarea) {
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input-group__append) {
+  padding: 0 16px;
+  background-color: #fff;
+  border: 1px solid #dcdfe6;
+  border-left: none;
+}
+
+:deep(.el-textarea__inner:hover) {
+  border-color: #c0c4cc !important;
+}
+
+:deep(.el-textarea__inner) {
+  resize: none;
+  min-height: unset !important;
+  font-family: monospace;
+  padding: 8px 12px !important;
+  line-height: 1.6 !important;
+  text-indent: 0 !important;
+  border: 1px solid #dcdfe6 !important;
+  transition: all 0.3s;
+}
+
+:deep(.el-textarea__inner:focus) {
+  border-color: #409eff !important;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
 }
 
 :deep(.markdown-body) {
@@ -705,11 +746,11 @@ onUnmounted(() => {
 }
 
 :deep(.copy-button) {
+  background: rgba(255, 255, 255, 0.7);
   position: absolute;
   top: 8px;
   right: 8px;
   padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #d1d5da;
   border-radius: 4px;
   font-size: 12px;
@@ -740,7 +781,7 @@ onUnmounted(() => {
 }
 
 :deep(.markdown-body code) {
-  background-color: rgba(175, 184, 193, 0.2);
+  background-color: transparent !important;
   padding: 0.2em 0.4em;
   border-radius: 6px;
   font-family:
@@ -756,14 +797,14 @@ onUnmounted(() => {
 }
 
 :deep(.markdown-body p code) {
-  background-color: rgba(175, 184, 193, 0.2);
+  background-color: transparent !important;
   color: #24292f;
   padding: 0.2em 0.4em;
   border-radius: 3px;
 }
 
 :deep(.hljs) {
-  background: #f6f8fa !important;
+  background: transparent !important;
   color: #24292f;
 }
 
@@ -784,30 +825,11 @@ onUnmounted(() => {
   color: #6e7781;
 }
 
-:deep(.el-textarea__inner) {
-  resize: none;
-  min-height: unset !important;
-  font-family: monospace;
-  padding: 8px 12px !important;
-  line-height: 1.6 !important;
-  text-indent: 0 !important;
-}
-
 .message.error {
   border: 1px solid #f56c6c;
 }
 
 .message.streaming {
   border: 1px solid #e6a23c;
-}
-
-:deep(.el-input-group__append) {
-  padding: 0 16px;
-  background-color: #fff;
-}
-
-:deep(.el-textarea__inner:focus) {
-  box-shadow: none;
-  border-color: #409eff;
 }
 </style>

@@ -66,11 +66,6 @@
         <el-icon><ArrowLeft /></el-icon>
       </div>
     </div>
-
-    <!-- 主内容区域 -->
-    <div class="main-content" :class="{ 'menu-collapsed': isCollapsed }">
-      <!-- ... 其他内容保持不变 ... -->
-    </div>
   </div>
 </template>
 
@@ -188,8 +183,8 @@ const toggleCollapse = () => {
   background-color: #f5f7fa;
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
   position: relative;
-  padding: 16px;
-  gap: 4px;
+  padding: 1px;
+  gap: 0;
 }
 
 .main-menu {
@@ -198,7 +193,7 @@ const toggleCollapse = () => {
   color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
+  padding: 24px 0;
   z-index: 2;
   box-shadow: 2px 0 8px rgba(107, 75, 253, 0.1);
   border-radius: 12px;
@@ -206,14 +201,14 @@ const toggleCollapse = () => {
 }
 
 .app-logo {
-  height: 48px;
+  height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
   padding: 0 4px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   position: relative;
 }
 
@@ -246,12 +241,13 @@ const toggleCollapse = () => {
 .main-content {
   flex: 1;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 0 12px 12px 0;
   transition: all 0.3s ease;
   overflow: hidden;
-  padding: 20px;
-  margin-left: 0;
+  padding: 10px;
+  margin: 0;
   border: 1px solid #ebeef5;
+  border-left: none;
 }
 
 .main-content.menu-collapsed {
@@ -465,9 +461,9 @@ const toggleCollapse = () => {
 .menu-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
-  padding: 0 12px;
+  padding: 24px 12px;
 }
 
 .menu-item {
@@ -503,7 +499,7 @@ const toggleCollapse = () => {
 .menu-text {
   font-size: 13px;
   text-align: center;
-  width: 80px;
+  width: 90px;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -520,11 +516,13 @@ const toggleCollapse = () => {
 .sub-menu-wrapper {
   position: relative;
   width: 220px;
-  height: calc(100vh - 32px);
+  height: calc(100vh - 2px);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   background: transparent;
   overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .sub-menu-wrapper.collapsed {
@@ -538,11 +536,12 @@ const toggleCollapse = () => {
   min-width: 220px;
   height: 100%;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 12px 0 0 12px;
   display: flex;
   flex-direction: column;
   box-shadow: none;
   border: 1px solid #ebeef5;
+  border-right: none;
   overflow: hidden;
 }
 
