@@ -29,7 +29,7 @@
   },
   "main": "dist/main/index.js",
   "scripts": {
-    "start": "chcp 65001 && electron-vite dev",
+    "start": "node scripts/start.js",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "package": "npm run build && electron-forge package",
